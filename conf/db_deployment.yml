@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: mysql-dc
+spec:
+  selector:
+    matchLabels:
+      app: mysql-dc
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql-dc
+    spec:
+      containers:
+      - image: mysql:8.0.18
+        name: mysql-dc
+        env:
+          # Use secret in real usage
+        - name: MYSQL_ROOT_PASSWORD
+          value: mysqlpasswd
+        ports:
+        - containerPort: 3306
+          name: mysql-dc
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
